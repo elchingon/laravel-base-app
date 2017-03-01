@@ -2,10 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+	
+	public function __construct()
+	{
+		$this->user = new User;
+	}
+	
     /**
      * Display a listing of the resource.
      *
@@ -13,7 +20,11 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        
+        $users = $this->user->all();
+        
+        return response()->json($users);
+        
     }
 
     /**
@@ -23,7 +34,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+
     }
 
     /**
@@ -34,7 +45,17 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+	    
+        $createUser = $this->user->create([
+            'name' => $request['name'],
+            'email' => $request['email'],
+            'password' => bcrypt($request['password']),
+        ]);
+        
+        $user = $this->user->find($createUser->id);
+        
+        return response()->json($user);
+        
     }
 
     /**
@@ -45,7 +66,9 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        //
+        $user = $this->user->find($id);
+        
+        return response()->json($user);
     }
 
     /**
@@ -68,7 +91,18 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        
+        $user = $this->user->find($id);
+        
+        $user->name = $request['name'];
+		
+		$user->email = $request['email'];
+		
+		$user->password = bcrypt($request['password']);
+		
+		$user->save();
+		
+		return response()->json($user);
     }
 
     /**
@@ -79,6 +113,8 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+     
+     $user = $this->user->find($id)->delete();
+        
     }
 }
